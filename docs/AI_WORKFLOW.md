@@ -656,3 +656,86 @@ Verification performed:
 Follow-up needed:
 
 - Review and approve Phase 6 before adding Hangfire GL posting simulation.
+
+## Entry: 2026-07-03 - Phase 6 Hangfire GL Posting Simulation
+
+What I asked AI to do:
+
+- Add only Hangfire-backed simulated GL posting for approved reserves.
+- Do not add frontend, real authentication, real GL integration, payments, or documents.
+
+What AI generated:
+
+- Hangfire SQL Server configuration in API startup.
+- Development-only Hangfire dashboard at `/hangfire`.
+- `ReserveGlPostingJob`.
+- `ReserveGlPostingJobQueue`.
+- `IReserveGlPostingJobQueue`.
+- GL posting enqueue from auto-approved reserve creation.
+- GL posting enqueue from manual reserve approval.
+- `GlPostedAtUtc` and `GlPostingReference` fields in claim detail reserve summaries.
+
+What I reviewed:
+
+- Required Phase 6 instructions and existing project documents.
+- Repository cleanliness before coding.
+- .NET SDK version through `global.json`.
+- Build output before and after changes.
+
+What I accepted:
+
+- Hangfire uses the existing `DefaultConnection` SQL Server database.
+- Hangfire creates its own storage tables; no EF migration was created.
+- Approved reserves enqueue a posting job.
+- Pending and rejected reserves are not enqueued for GL posting.
+- The job no-ops when a reserve is not `Approved`.
+- The job no-ops when `GlPostedAtUtc` is already set.
+- Successful simulated posting sets `GlPostedAtUtc`, sets `GlPostingReference`, and writes `ReserveGlPosted`.
+
+What I rejected:
+
+- Real external GL or accounting integration.
+- Frontend work.
+- Real authentication.
+- Payments or documents.
+
+What I learned:
+
+- The existing reserve schema already had the GL posting fields needed for the Phase 6 job.
+- Exposing GL posting fields in claim detail makes the asynchronous job easy to verify through Swagger/API.
+
+Files affected:
+
+- `src/ClaimsModule.API/Program.cs`
+- `src/ClaimsModule.API/ClaimsModule.API.csproj`
+- `src/ClaimsModule.Application/Interfaces/IReserveGlPostingJobQueue.cs`
+- `src/ClaimsModule.Application/Reserves/CreateReserve/CreateReserveCommandHandler.cs`
+- `src/ClaimsModule.Application/Reserves/ApproveReserve/ApproveReserveCommandHandler.cs`
+- `src/ClaimsModule.Application/Claims/GetClaimById/`
+- `src/ClaimsModule.Infrastructure/BackgroundJobs/`
+- `src/ClaimsModule.Infrastructure/DependencyInjection.cs`
+- `README.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `docker compose up -d`
+- `dotnet tool run dotnet-ef database update --project src/ClaimsModule.Persistence --startup-project src/ClaimsModule.API`
+- API smoke test: `GET /health` returned `200 OK` with response body `OK`
+- Development Hangfire dashboard at `/hangfire` returned `200 OK`
+- API startup created Hangfire SQL storage tables through Hangfire storage, not EF migrations
+- `POST /api/claims` returned `201 Created`
+- `POST /api/claims/{claimId}/reserves` with amount 5000 returned status `Approved`
+- the auto-approved reserve was posted by Hangfire and claim detail showed `GlPostedAtUtc`, `GlPostingReference`, and `ReserveGlPosted`
+- `POST /api/claims/{claimId}/reserves` with amount 15000 returned status `PendingApproval`
+- pending reserve detail showed no GL posting before approval
+- approving the pending reserve returned `200 OK`, then Hangfire posted it and claim detail showed `ReserveGlPosted`
+- rejecting another pending reserve returned `200 OK`, and claim detail showed no GL posting fields for the rejected reserve
+- manually invoking the GL posting job twice for an already-posted reserve did not change its `GlPostingReference` and did not add another `ReserveGlPosted` audit entry
+
+Follow-up needed:
+
+- Review the completed backend MVP flow before deciding whether to polish Swagger samples or add an optional frontend.
