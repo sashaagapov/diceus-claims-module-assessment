@@ -503,3 +503,75 @@ Verification performed:
 Follow-up needed:
 
 - Review and approve Phase 5 before adding reserve creation and approval workflow.
+
+## Entry: 2026-07-03 - Phase 5A Reserve Creation
+
+What I asked AI to do:
+
+- Add only reserve creation for existing claims.
+- Do not add reserve approval, rejection, self-approval prevention, Hangfire, frontend, real authentication, payments, or documents.
+
+What AI generated:
+
+- `CreateReserveCommand`.
+- `CreateReserveCommandValidator`.
+- `CreateReserveCommandHandler`.
+- `CreateReserveResponse`.
+- `POST /api/claims/{claimId}/reserves`.
+
+What I reviewed:
+
+- Required Phase 5A instructions and existing project documents.
+- Repository cleanliness before coding.
+- .NET SDK version through `global.json`.
+- Build output before and after changes.
+
+What I accepted:
+
+- `201 Created` for successful reserve creation.
+- `404 Not Found` for non-empty missing claim IDs.
+- `400 Bad Request` for validation and inactive or missing creator users.
+- Auto-approved status for reserves up to 10,000.
+- Pending approval status for reserves above 10,000.
+- `ReserveCreated` audit entry with amount, currency, and resulting status.
+
+What I rejected:
+
+- Manual reserve approval or rejection.
+- Self-approval validation.
+- Hangfire GL posting.
+- Frontend work.
+- Real authentication.
+- Payments or documents.
+
+What I learned:
+
+- Reserve creation can reuse the existing Phase 2 schema, so no migration is needed.
+- Claim detail already includes reserve and audit summaries, which makes the new flow easy to verify through existing read endpoints.
+
+Files affected:
+
+- `src/ClaimsModule.Application/Reserves/CreateReserve/`
+- `src/ClaimsModule.API/Controllers/ClaimsController.cs`
+- `README.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `docker compose up -d`
+- `dotnet tool run dotnet-ef database update --project src/ClaimsModule.Persistence --startup-project src/ClaimsModule.API`
+- API smoke test: `GET /health` returned `200 OK` with response body `OK`
+- `POST /api/claims` returned `201 Created`
+- `POST /api/claims/{claimId}/reserves` with amount 5000 returned `201 Created` and status `Approved`
+- `POST /api/claims/{claimId}/reserves` with amount 15000 returned `201 Created` and status `PendingApproval`
+- `GET /api/claims/{id}` showed the created reserves in claim detail
+- claim detail audit log included `ReserveCreated`
+- non-empty missing claim ID returned `404 Not Found`
+- invalid reserve amount returned `400 Bad Request`
+
+Follow-up needed:
+
+- Review and approve Phase 5B before adding manual reserve approval and rejection.
