@@ -267,3 +267,85 @@ Follow-up needed:
 
 - Install/start Docker or provide another SQL Server instance, then run `dotnet ef database update`.
 - Review and approve Phase 3 before adding claim creation endpoints or MediatR use cases.
+
+## Entry: 2026-07-03 - Phase 3 Claim/FNOL Creation
+
+What I asked AI to do:
+
+- Implement only the first FNOL claim creation vertical slice.
+- Add minimal lookup endpoints for policies and cause-of-loss codes.
+- Do not add claim list/detail, status transitions, reserves, Hangfire, frontend, or real authentication.
+
+What AI generated:
+
+- MediatR query for policy lookup.
+- MediatR query for active cause-of-loss code lookup.
+- MediatR command, validator, handler, DTOs, and response for claim creation.
+- Thin API controllers for policies, cause-of-loss codes, and claims.
+- Validation middleware for FluentValidation errors.
+- A small result type for simple business-rule failures.
+- `IClaimsModuleDbContext` abstraction implemented by `ClaimsModuleDbContext`.
+
+What I reviewed:
+
+- Required Phase 3 instructions and existing project documents.
+- Repository cleanliness before coding.
+- .NET SDK version through `global.json`.
+- Existing Phase 2 migration.
+- Docker/SQL Server availability.
+- API and database verification output.
+
+What I changed manually:
+
+- Downgraded MediatR from 14.2.0 to 12.5.0 to avoid development license warning noise during the assessment demo.
+- Configured API JSON options to serialize enums as strings for clearer Swagger requests/responses.
+
+What I accepted:
+
+- Controller -> MediatR -> FluentValidation -> Handler -> EF Core -> SQL Server flow.
+- Business checks for active policy, active cause-of-loss code, and active mock user.
+- Claim creation with status `Open`, generated claim number, parties, risk objects, and `ClaimCreated` audit entry.
+
+What I rejected:
+
+- Claim list/detail endpoints.
+- Claim status transitions.
+- Reserve creation or approval workflow.
+- Hangfire GL posting.
+- Frontend work.
+- Real authentication.
+
+What I learned:
+
+- SQL Server Docker container is available in the current environment.
+- The FNOL creation flow can be verified end-to-end against the local database.
+
+Files affected:
+
+- `src/ClaimsModule.Application/Claims/CreateClaim/`
+- `src/ClaimsModule.Application/Policies/GetPolicies/`
+- `src/ClaimsModule.Application/CauseOfLossCodes/GetCauseOfLossCodes/`
+- `src/ClaimsModule.Application/Common/`
+- `src/ClaimsModule.Application/Interfaces/`
+- `src/ClaimsModule.API/Controllers/`
+- `src/ClaimsModule.API/Middleware/`
+- `src/ClaimsModule.API/Program.cs`
+- `src/ClaimsModule.Persistence/`
+- `README.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `dotnet tool run dotnet-ef database update --project src/ClaimsModule.Persistence --startup-project src/ClaimsModule.API`
+- API smoke test: `GET /health` returned `200 OK` with response body `OK`
+- `GET /api/policies` returned seeded policies
+- `GET /api/cause-of-loss-codes` returned seeded cause-of-loss codes
+- `POST /api/claims` returned `201 Created`
+- SQL Server check confirmed the created claim and `ClaimCreated` audit log entry were saved
+
+Follow-up needed:
+
+- Review and approve Phase 4 before adding claim list/detail or status transitions.
