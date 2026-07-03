@@ -739,3 +739,77 @@ Verification performed:
 Follow-up needed:
 
 - Review the completed backend MVP flow before deciding whether to polish Swagger samples or add an optional frontend.
+
+## Entry: 2026-07-03 - Phase 7A Backend MVP Hardening And Swagger Demo Polish
+
+What I asked AI to do:
+
+- Harden and polish the completed backend MVP demo flow.
+- Do not add frontend, real authentication, real GL integration, payments, documents, automated tests, or new business features.
+
+What AI generated:
+
+- README demo flow with run commands, endpoint sequence, seeded IDs, and sample JSON bodies.
+- `docs/DEMO_CHECKLIST.md` with commands, endpoints, expected outputs, and common errors.
+- Tradeoff status update for the completed backend demo polish phase.
+
+What I reviewed:
+
+- Required Phase 7A instructions and existing project documents.
+- Repository cleanliness before edits.
+- .NET SDK version through `global.json`.
+- Existing API surface and obvious issue scan.
+- Build output before documentation changes.
+
+What I accepted:
+
+- Documentation-first Swagger/demo polish.
+- README sample requests instead of heavier Swagger customization packages.
+- A concise checklist for reviewers and future manual demos.
+
+What I rejected:
+
+- Frontend work.
+- Real authentication.
+- Real GL integration.
+- Payments or documents.
+- New business behavior.
+- Automated tests in this phase.
+
+What I learned:
+
+- The current API surface is reviewable through Swagger without adding new Swagger packages.
+- A checklist is enough to make the backend MVP demo repeatable while keeping Phase 7A low risk.
+
+Files affected:
+
+- `README.md`
+- `docs/DEMO_CHECKLIST.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `docker compose up -d`
+- `dotnet tool run dotnet-ef database update --project src/ClaimsModule.Persistence --startup-project src/ClaimsModule.API`
+- API smoke test: `GET /health` returned `200 OK` with response body `OK`
+- Swagger UI at `/swagger/index.html` returned `200 OK`
+- Development Hangfire dashboard at `/hangfire` returned `200 OK`
+- `GET /api/policies` returned seeded policies
+- `GET /api/cause-of-loss-codes` returned seeded cause-of-loss codes
+- `POST /api/claims` returned `201 Created`
+- `GET /api/claims/{id}` returned claim detail with parties, risk objects, and audit log entries
+- `PATCH /api/claims/{id}/status` from `Open` to `UnderInvestigation` returned `200 OK`
+- invalid status transition returned `422 Unprocessable Entity`
+- `POST /api/claims/{claimId}/reserves` with amount 5000 returned `Approved`, and Hangfire added GL posting fields plus `ReserveGlPosted`
+- `POST /api/claims/{claimId}/reserves` with amount 15000 returned `PendingApproval`
+- approving the pending reserve as supervisor returned `200 OK`, and Hangfire added GL posting fields plus `ReserveGlPosted`
+- rejecting another pending reserve as manager returned `200 OK`, and the rejected reserve had no GL posting fields
+- handler approval attempt returned `403 Forbidden`
+- self-approval attempt returned `422 Unprocessable Entity`
+
+Follow-up needed:
+
+- Consider automated integration tests as a separate hardening phase.
