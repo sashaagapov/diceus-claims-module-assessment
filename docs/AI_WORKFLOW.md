@@ -423,3 +423,83 @@ Verification performed:
 Follow-up needed:
 
 - Review and approve Phase 4B before adding claim status transitions.
+
+## Entry: 2026-07-03 - Phase 4B Claim Status Transitions
+
+What I asked AI to do:
+
+- Add only controlled claim status transitions.
+- Do not add reserve creation, reserve approval, Hangfire, frontend, real authentication, documents, or payments.
+
+What AI generated:
+
+- `UpdateClaimStatusCommand`.
+- `UpdateClaimStatusCommandValidator`.
+- `UpdateClaimStatusCommandHandler`.
+- `UpdateClaimStatusResponse`.
+- `PATCH /api/claims/{id}/status`.
+- Visible allowed transition rules.
+
+What I reviewed:
+
+- Required Phase 4B instructions and existing project documents.
+- Repository cleanliness before coding.
+- .NET SDK version through `global.json`.
+- Build output before and after changes.
+- API verification output for valid transition, invalid transition, missing claim, and audit log behavior.
+
+What I changed manually:
+
+- Extended `ClaimStatus` with the statuses required by the Phase 4B workflow: `UnderInvestigation`, `PendingPayment`, `Reopened`, and `Withdrawn`.
+- Kept previous enum values as legacy/unused values to avoid breaking any existing stored strings.
+- Inserted status-change audit entries through `dbContext.AuditLogEntries.Add(...)` with `ClaimId` set explicitly. This keeps the audit insert clear and avoids EF treating a new audit entry with a non-default Guid as an update.
+
+What I accepted:
+
+- Simple allowed-transition set in the handler.
+- `200 OK` for valid status change.
+- `404 Not Found` for non-empty missing claim IDs.
+- `422 Unprocessable Entity` for disallowed transitions.
+- `ClaimStatusChanged` audit entry with old and new status in details.
+
+What I rejected:
+
+- Reserve creation.
+- Reserve approval workflow.
+- Hangfire GL posting.
+- Frontend work.
+- Real authentication.
+- Documents or payments.
+
+What I learned:
+
+- Since claim statuses are stored as strings, adding enum members does not require a database migration.
+- Explicit audit inserts are easier to explain and safer than adding a new audit record through an unloaded navigation collection.
+
+Files affected:
+
+- `src/ClaimsModule.Domain/Enums/ClaimStatus.cs`
+- `src/ClaimsModule.Application/Claims/UpdateClaimStatus/`
+- `src/ClaimsModule.API/Controllers/ClaimsController.cs`
+- `README.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `docker compose up -d`
+- `dotnet tool run dotnet-ef database update --project src/ClaimsModule.Persistence --startup-project src/ClaimsModule.API`
+- API smoke test: `GET /health` returned `200 OK` with response body `OK`
+- `POST /api/claims` returned `201 Created`
+- `GET /api/claims/{id}` showed initial status `Open`
+- `PATCH /api/claims/{id}/status` from `Open` to `UnderInvestigation` returned `200 OK`
+- `GET /api/claims/{id}` showed updated status `UnderInvestigation`
+- claim detail audit log included `ClaimStatusChanged`
+- invalid transition `UnderInvestigation` to `Closed` returned `422 Unprocessable Entity`
+- non-empty missing claim ID returned `404 Not Found`
+
+Follow-up needed:
+
+- Review and approve Phase 5 before adding reserve creation and approval workflow.
