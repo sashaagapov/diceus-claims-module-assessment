@@ -575,3 +575,84 @@ Verification performed:
 Follow-up needed:
 
 - Review and approve Phase 5B before adding manual reserve approval and rejection.
+
+## Entry: 2026-07-03 - Phase 5B Reserve Approval And Rejection
+
+What I asked AI to do:
+
+- Add only manual approval and rejection for pending reserves.
+- Do not add Hangfire GL posting, actual GL posting, frontend, real authentication, payments, or documents.
+
+What AI generated:
+
+- `ApproveReserveCommand`.
+- `ApproveReserveCommandValidator`.
+- `ApproveReserveCommandHandler`.
+- `ApproveReserveResponse`.
+- `RejectReserveCommand`.
+- `RejectReserveCommandValidator`.
+- `RejectReserveCommandHandler`.
+- `RejectReserveResponse`.
+- `PATCH /api/claims/{claimId}/reserves/{reserveId}/approve`.
+- `PATCH /api/claims/{claimId}/reserves/{reserveId}/reject`.
+
+What I reviewed:
+
+- Required Phase 5B instructions and existing project documents.
+- Repository cleanliness before coding.
+- .NET SDK version through `global.json`.
+- Build output before and after changes.
+
+What I accepted:
+
+- `200 OK` for successful approval or rejection.
+- `404 Not Found` for non-empty missing claim or reserve IDs.
+- `400 Bad Request` for validation and missing or inactive actor users.
+- `403 Forbidden` when a handler tries to approve or reject.
+- `422 Unprocessable Entity` for self-approval, self-rejection, and invalid reserve state.
+- `ReserveApproved` and `ReserveRejected` audit entries with reserve, amount, currency, actor, and reason details.
+
+What I rejected:
+
+- Hangfire GL posting.
+- Actual GL posting.
+- Real authentication or authorization framework.
+- Frontend work.
+- Payments or documents.
+
+What I learned:
+
+- Seeded mock users are enough to demonstrate supervisor and manager authorization for the MVP.
+- Manual reserve workflow can reuse the existing Phase 2 reserve fields, so no migration is needed.
+
+Files affected:
+
+- `src/ClaimsModule.Application/Reserves/ApproveReserve/`
+- `src/ClaimsModule.Application/Reserves/RejectReserve/`
+- `src/ClaimsModule.API/Controllers/ClaimsController.cs`
+- `README.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `docker compose up -d`
+- `dotnet tool run dotnet-ef database update --project src/ClaimsModule.Persistence --startup-project src/ClaimsModule.API`
+- API smoke test: `GET /health` returned `200 OK` with response body `OK`
+- `POST /api/claims` returned `201 Created`
+- `POST /api/claims/{claimId}/reserves` with amount 15000 returned `PendingApproval`
+- approving as the same user who created the reserve returned `422 Unprocessable Entity`
+- approving as handler returned `403 Forbidden`
+- approving as supervisor returned `200 OK` and status `Approved`
+- claim detail audit log included `ReserveApproved`
+- creating another pending reserve and rejecting as manager returned `200 OK` and status `Rejected`
+- claim detail audit log included `ReserveRejected`
+- approving/rejecting a missing reserve returned `404 Not Found`
+- approving an already approved reserve returned `422 Unprocessable Entity`
+- rejecting as the same user who created the reserve returned `422 Unprocessable Entity`
+
+Follow-up needed:
+
+- Review and approve Phase 6 before adding Hangfire GL posting simulation.
