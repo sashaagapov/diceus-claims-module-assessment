@@ -349,3 +349,77 @@ Verification performed:
 Follow-up needed:
 
 - Review and approve Phase 4 before adding claim list/detail or status transitions.
+
+## Entry: 2026-07-03 - Phase 4A Claim List And Detail
+
+What I asked AI to do:
+
+- Add read-only claim browsing only.
+- Do not add status transitions, reserves, Hangfire, frontend, or real authentication.
+
+What AI generated:
+
+- `GetClaimsQuery`, handler, and list DTO.
+- `GetClaimByIdQuery`, handler, and detail DTOs for parties, risk objects, reserves, and audit log entries.
+- `GET /api/claims`.
+- `GET /api/claims/{id}`.
+
+What I reviewed:
+
+- Required Phase 4A instructions and existing project documents.
+- Repository cleanliness before coding.
+- .NET SDK version through `global.json`.
+- Build output before and after changes.
+- API verification output for list, detail, and not-found behavior.
+
+What I changed manually:
+
+- Kept claim detail as several small `AsNoTracking` read queries instead of one large multi-collection projection. This avoids EF Core's multiple collection single-query warning and stays easy to explain.
+- Added `Reserves` to `IClaimsModuleDbContext` so claim detail can return an empty or populated reserve summary without exposing the concrete DbContext.
+
+What I accepted:
+
+- Read-only query handlers using `AsNoTracking`.
+- Thin controller actions that only call MediatR and shape HTTP responses.
+- `404 Not Found` with a simple error for missing claim detail.
+
+What I rejected:
+
+- Claim status transitions.
+- Reserve creation or approval workflow.
+- Hangfire GL posting.
+- Frontend work.
+- Real authentication.
+
+What I learned:
+
+- The existing FNOL-created claims can now be browsed through Swagger/API.
+- Detail reads should avoid a single large joined query when loading multiple child collections.
+
+Files affected:
+
+- `src/ClaimsModule.Application/Claims/GetClaims/`
+- `src/ClaimsModule.Application/Claims/GetClaimById/`
+- `src/ClaimsModule.Application/Interfaces/IClaimsModuleDbContext.cs`
+- `src/ClaimsModule.API/Controllers/ClaimsController.cs`
+- `README.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `docker compose up -d`
+- `dotnet tool run dotnet-ef database update --project src/ClaimsModule.Persistence --startup-project src/ClaimsModule.API`
+- API smoke test: `GET /health` returned `200 OK` with response body `OK`
+- `GET /api/policies` returned seeded policies
+- `GET /api/cause-of-loss-codes` returned seeded cause-of-loss codes
+- `POST /api/claims` returned `201 Created`
+- `GET /api/claims` returned the created claim first
+- `GET /api/claims/{id}` returned full claim detail
+- `GET /api/claims/{missingId}` returned `404 Not Found`
+
+Follow-up needed:
+
+- Review and approve Phase 4B before adding claim status transitions.
