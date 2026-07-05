@@ -882,3 +882,75 @@ Verification performed:
 Follow-up needed:
 
 - Review the automated test coverage and then decide whether Phase 8 documentation/cleanup is enough or whether any additional backend hardening is needed.
+
+## Entry: 2026-07-05 - Phase 8A Angular Scaffold Only
+
+What I asked AI to do:
+
+- Create only the Angular frontend scaffold.
+- Add routing, Angular Material, a basic app shell, a placeholder home page, and environment-based API base URL.
+- Do not implement claims list, FNOL form, claim detail, reserves UI, mock auth, deployment, CI/CD, or backend business-rule changes.
+
+What AI generated:
+
+- Angular app under `frontend/claims-module-web`.
+- Angular routing with a placeholder home route.
+- Angular Material toolbar and placeholder card shell.
+- Environment files with `apiBaseUrl` set to `http://localhost:5188`.
+- Frontend local run documentation.
+
+What I reviewed:
+
+- `AGENTS.md`.
+- Clean git status before the phase.
+- Baseline backend restore, build, and integration test results.
+- Local Node, npm, Angular CLI, and Angular Material compatibility.
+
+What I changed manually:
+
+- Replaced the generated Angular starter page with a minimal Claims Module app shell.
+- Added a project-specific frontend README.
+- Documented the frontend run commands in the root README.
+
+What I accepted:
+
+- Angular 21 scaffold because it is Angular 18+ and compatible with the local Node 25 runtime.
+- Angular Material as the UI library.
+- No backend CORS change yet because the scaffold does not call the API.
+
+What I rejected:
+
+- Claims list.
+- FNOL form.
+- Claim detail.
+- Reserve actions.
+- Mock authentication.
+- Backend business logic changes.
+- Azure deployment or CI/CD.
+
+What I learned:
+
+- Angular CLI 22 requires Node versions that exclude the local Node 25 runtime, while Angular CLI 21 supports it.
+- The frontend can be scaffolded cleanly without changing backend behavior.
+
+Files affected:
+
+- `frontend/claims-module-web/`
+- `README.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `dotnet test ClaimsModule.sln`
+- `npm install`
+- `npm run build`
+- `npm start`
+- Manual browser check at `http://localhost:4200`
+- Manual Swagger check at `http://localhost:5188/swagger/index.html`
+
+Follow-up needed:
+
+- Review and approve Phase 8B before adding the frontend API layer, mock user context, or app shell expansion.
