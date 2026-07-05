@@ -190,6 +190,71 @@ Follow-up needed:
 
 - Review and approve Phase 2 before adding domain entities, EF Core DbContext, configurations, migrations, or seed data.
 
+## Entry: 2026-07-05 - Phase 8B Frontend API Layer And App Shell
+
+What I asked AI to do:
+
+- Add the Angular frontend API layer, mock user context, HTTP interceptors, and app shell only.
+- Do not implement claims list, FNOL, claim detail, reserve UI, or any later frontend phase.
+
+What AI generated:
+
+- Strict TypeScript DTO models for policies, reference data, claims, reserves, audit log entries, and request/response payloads.
+- Angular API services for claims, policies, and reference data using `inject(HttpClient)`.
+- A mock `AuthContextService` seeded with Handler, Supervisor, and Manager users.
+- HTTP interceptors for the `X-User-Id` mock header and global API error snackbars.
+- A Material toolbar shell with placeholder navigation and a mock user selector.
+- Placeholder routed pages for future `Claims` and `New Claim` screens.
+
+What I reviewed:
+
+- Existing backend endpoint and DTO shapes.
+- Current Angular scaffold structure.
+- Phase 8B scope limits from `AGENTS.md`.
+
+What I changed manually:
+
+- Kept frontend routes as placeholders so business screens remain out of scope.
+- Documented the mock-user-header simplification as a tradeoff.
+
+What I accepted:
+
+- Frontend infrastructure needed by later approved phases.
+- Angular Material app shell and user selector.
+
+What I rejected:
+
+- Claims dashboard, FNOL form, claim detail UI, reserve actions UI, NgRx, real authentication, and backend business-rule changes.
+
+What I learned:
+
+- The backend currently receives actor IDs in request bodies; the frontend mock header is useful shell context but is not real authentication.
+
+Files affected:
+
+- `frontend/claims-module-web/src/environments/`
+- `frontend/claims-module-web/src/app/core/`
+- `frontend/claims-module-web/src/app/features/placeholder-page/`
+- `frontend/claims-module-web/src/app/app.*`
+- `frontend/claims-module-web/src/app/home/home.html`
+- `README.md`
+- `docs/AI_WORKFLOW.md`
+- `docs/TRADEOFFS.md`
+
+Verification performed:
+
+- `npm run build`
+- `npm test -- --watch=false`
+- `npm start`
+- Manual shell check at `http://localhost:4200` with toolbar, placeholder home page, navigation links, and mock user selector.
+- Swagger check at `http://localhost:5188/swagger/index.html`.
+- `dotnet build ClaimsModule.sln --no-restore`
+- `dotnet test ClaimsModule.sln`
+
+Follow-up needed:
+
+- Review and approve Phase 8C before implementing the claims list dashboard.
+
 ## Entry: 2026-07-03 - Phase 2 Domain Model And EF Core Persistence
 
 What I asked AI to do:
