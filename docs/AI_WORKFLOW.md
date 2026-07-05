@@ -1019,3 +1019,72 @@ Verification performed:
 Follow-up needed:
 
 - Review and approve Phase 8B before adding the frontend API layer, mock user context, or app shell expansion.
+
+## Entry: 2026-07-05 - Phase 8C Claims List Dashboard
+
+What I asked AI to do:
+
+- Add only the Angular claims list dashboard.
+- Do not implement the FNOL form, claim detail screen, reserve UI, or any later frontend phase.
+
+What AI generated:
+
+- Standalone `ClaimsList` component under `frontend/claims-module-web/src/app/features/claims/`.
+- Angular route wiring so `/` redirects to `/claims` and `/claims` loads the claims list.
+- A placeholder `/claims/:id` route for future claim detail work.
+- Material table UI with Claim Number, Loss Date, Status, and Actions columns.
+- Loading and empty states for the claims list.
+- Development-only CORS for the local Angular origin.
+
+What I reviewed:
+
+- `AGENTS.md`.
+- MVP scope, implementation plan, project context, and architecture decisions.
+- Existing Angular app shell and frontend API service.
+- Backend API startup to keep the CORS change minimal and Development-only.
+
+What I changed manually:
+
+- Kept the `View` action as a placeholder route link instead of implementing detail UI.
+- Updated documentation to show that the frontend now has a claims list but not FNOL/detail/reserve screens.
+
+What I accepted:
+
+- A simple Material table backed by `ClaimsApiService.getClaims()`.
+- The smallest backend startup change needed for local browser API access.
+
+What I rejected:
+
+- FNOL form.
+- Claim detail implementation.
+- Reserve actions.
+- Backend business-rule changes.
+- Real authentication.
+
+What I learned:
+
+- Once Angular calls the API from the browser, local Development CORS is required for `http://localhost:4200`.
+
+Files affected:
+
+- `src/ClaimsModule.API/Program.cs`
+- `frontend/claims-module-web/src/app/app.routes.ts`
+- `frontend/claims-module-web/src/app/features/claims/`
+- `README.md`
+- `docs/AI_WORKFLOW.md`
+- `docs/TRADEOFFS.md`
+
+Verification performed:
+
+- `npm run build`
+- `npm test -- --watch=false`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `dotnet test ClaimsModule.sln`
+- `npm start`
+- Manual browser check at `http://localhost:4200/claims`: claims table rendered backend data with Claim Number, Loss Date, Status, and Actions columns.
+- Manual `View` action check: table link navigated to `/claims/:id` placeholder route.
+- API smoke check: `GET http://localhost:5188/api/claims` returned local database claims.
+
+Follow-up needed:
+
+- Review and approve Phase 8D before implementing the FNOL create claim form.
