@@ -813,3 +813,72 @@ Verification performed:
 Follow-up needed:
 
 - Consider automated integration tests as a separate hardening phase.
+
+## Entry: 2026-07-05 - Phase 7B Automated Backend Integration Tests
+
+What I asked AI to do:
+
+- Add automated integration tests for the existing backend MVP flow only.
+- Do not add frontend, real authentication, real GL integration, payments, documents, or new business features.
+
+What AI generated:
+
+- `tests/ClaimsModule.IntegrationTests` xUnit project.
+- `Microsoft.AspNetCore.Mvc.Testing` API test host setup.
+- SQL Server-backed test factory that creates and drops a temporary database per test run.
+- Integration tests for health, lookup endpoints, FNOL claim creation, claim list/detail, status transitions, reserve rules, Hangfire GL posting, and GL posting idempotency.
+- Test setup notes in `tests/ClaimsModule.IntegrationTests/README.md`.
+
+What I reviewed:
+
+- Required Phase 7B prompt and repository documents.
+- Repository cleanliness before changes.
+- .NET SDK version through `global.json`.
+- Baseline restore/build output.
+- Test failures from unavailable Docker, SQL Server Testcontainers instability, and enum JSON deserialization.
+
+What I changed manually:
+
+- Added `public partial class Program` so `WebApplicationFactory<Program>` can host the API.
+- Switched from Testcontainers to the existing Docker Compose SQL Server after SQL Server Testcontainers proved unstable under local Docker Desktop resource limits.
+- Added JSON enum converter options to the test helpers to match API enum serialization.
+
+What I accepted:
+
+- Real HTTP-level integration tests using the API pipeline and SQL Server persistence.
+- A temporary database per test run for isolation.
+- Direct `ReserveGlPostingJob` idempotency verification after Hangfire posts the approved reserve once.
+
+What I rejected:
+
+- Frontend work.
+- Real authentication.
+- Real GL integration.
+- Payments or documents.
+- Any production business-rule changes.
+
+What I learned:
+
+- The backend MVP flow is now covered by repeatable automated tests.
+- SQL Server Testcontainers can be heavier than the local Docker Desktop resource limits in this environment; the existing compose SQL Server is simpler and explainable for this assessment.
+
+Files affected:
+
+- `ClaimsModule.sln`
+- `src/ClaimsModule.API/Program.cs`
+- `tests/ClaimsModule.IntegrationTests/`
+- `README.md`
+- `docs/TRADEOFFS.md`
+- `docs/AI_WORKFLOW.md`
+
+Verification performed:
+
+- `dotnet --version` returned `9.0.315`
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `docker compose up -d`
+- `dotnet test ClaimsModule.sln` passed with 5 tests
+
+Follow-up needed:
+
+- Review the automated test coverage and then decide whether Phase 8 documentation/cleanup is enough or whether any additional backend hardening is needed.
