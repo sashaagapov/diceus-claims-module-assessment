@@ -1240,3 +1240,78 @@ Verification performed:
 Follow-up needed:
 
 - Continue to Phase 8F only after Phase 8E is committed and pushed successfully.
+
+## Entry: 2026-07-06 - Phase 8F Reserve Actions And Status Transition UI
+
+What I asked AI to do:
+
+- Add reserve creation, pending reserve approval/rejection, and minimal status transition UI on claim detail.
+- Do not implement unsupported lifecycle transitions, backend rule changes, document upload, real authentication, or later phases.
+
+What AI generated:
+
+- Reserve creation form on the claim detail Reserves tab.
+- Authority preview showing auto-approval for reserves up to 10,000 and approval requirement above 10,000.
+- Pending reserve approve/reject controls for Supervisor and Manager demo users.
+- Handler-only view that does not expose approve/reject actions.
+- Reject reason input and submit action.
+- Minimal `Open -> UnderInvestigation` status action.
+- Reload-after-success behavior and success snackbars.
+
+What I reviewed:
+
+- Existing reserve and status API endpoints.
+- Reserve and status command validators.
+- Existing frontend API service request/response models.
+- Phase 8F scope boundaries from the frontend MVP plan.
+
+What I changed manually:
+
+- Kept reserve and status actions on the existing detail screen.
+- Used the selected mock user for reserve creation and actor IDs.
+- Kept status transition UI intentionally narrow to one supported transition.
+
+What I accepted:
+
+- Role-aware controls using the existing mock user selector.
+- Existing backend business rules without weakening or duplicating them.
+
+What I rejected:
+
+- Unsupported claim lifecycle transition picker.
+- Backend rule changes.
+- Real authentication.
+- Document upload.
+
+What I learned:
+
+- The existing backend reserve workflow supports the required frontend flow without DTO changes.
+- Handler role can be represented safely by hiding privileged pending-reserve actions.
+
+Files affected:
+
+- `frontend/claims-module-web/src/app/features/claims/claim-detail/`
+- `README.md`
+- `docs/AI_WORKFLOW.md`
+- `docs/TRADEOFFS.md`
+
+Verification performed:
+
+- `npm run build`
+- `npm test -- --watch=false`
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `dotnet test ClaimsModule.sln`
+- `npm start`
+- Manual browser check: added a `5000 USD` reserve and confirmed it became `Approved`.
+- Manual browser check: added a `15000 USD` reserve and confirmed it became `PendingApproval`.
+- Manual role check: Handler did not see approve/reject controls for pending reserve.
+- Manual role check: Supervisor approved a pending reserve.
+- Manual role check: Manager rejected a pending reserve with a reason.
+- Manual status check: `Open -> UnderInvestigation` worked and reloaded the detail screen.
+- Manual API check: final detail response showed `UnderInvestigation`, approved reserves, and rejected reserve.
+- Manual console check: no browser console errors or warnings from the app.
+
+Follow-up needed:
+
+- Continue to Phase 8G only after Phase 8F is committed and pushed successfully.
