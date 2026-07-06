@@ -1315,3 +1315,80 @@ Verification performed:
 Follow-up needed:
 
 - Continue to Phase 8G only after Phase 8F is committed and pushed successfully.
+
+## Entry: 2026-07-06 - Phase 8G Frontend Docs Polish And Final Smoke
+
+What I asked AI to do:
+
+- Review and polish the Angular frontend MVP.
+- Update frontend documentation and tradeoffs.
+- Run final backend, frontend, and manual smoke verification.
+
+What AI generated:
+
+- README frontend demo flow and known simplifications updates.
+- Tradeoff updates for local-only frontend, client-side filtering, mock users, no real auth, no deployment, no document upload, and limited lifecycle UI.
+- Final frontend MVP review notes in this workflow log.
+
+What I reviewed:
+
+- No direct `HttpClient` usage in components.
+- Typed API services remain under `core/services`.
+- No NgRx package or usage.
+- Mock user selector is documented as mock context, not real authentication.
+- Loading, error, and empty states across claims list, FNOL, and detail views.
+- Routes for `/claims`, `/claims/new`, and `/claims/:id`.
+
+What I changed manually:
+
+- Added README known simplifications.
+- Updated tradeoffs to reflect the final frontend MVP state.
+
+What I accepted:
+
+- Local Angular MVP covering list, FNOL, detail, reserves, status action, and mock user switching.
+
+What I rejected:
+
+- Azure deployment.
+- CI/CD.
+- Real authentication.
+- Document upload.
+- Generic unsupported status transition UI.
+
+What I learned:
+
+- The frontend MVP can demonstrate the full assessment workflow locally while preserving backend-first architecture and explicit tradeoffs.
+
+Files affected:
+
+- `README.md`
+- `docs/AI_WORKFLOW.md`
+- `docs/TRADEOFFS.md`
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln` — all projects up-to-date.
+- `dotnet build ClaimsModule.sln --no-restore` — Build succeeded, 0 warnings, 0 errors.
+- `dotnet test ClaimsModule.sln` — Passed: 5, Failed: 0, Skipped: 0.
+- `npm install` — dependencies up-to-date.
+- `npm run build` — build succeeded (budget warning only, not an error).
+- `npm test -- --watch=false` — Passed: 2, Failed: 0.
+- API smoke: `GET /health` → OK.
+- API smoke: `GET /api/claims` → returns real seeded and test claim records.
+- API smoke: `POST /api/claims` (FNOL) → CLM-20260706-927275 created, status Open, parties and risk objects persisted.
+- API smoke: `GET /api/claims/{id}` → full detail with parties, risk objects, reserves, audit log.
+- API smoke: `POST /api/claims/{id}/reserves` with 5000 USD → status Approved (auto-approved).
+- API smoke: `POST /api/claims/{id}/reserves` with 15000 USD → status PendingApproval.
+- API smoke: Handler self-approval attempt → 422 "Users cannot approve their own reserve." ✅
+- API smoke: Supervisor approves pending 15000 USD reserve → 200 Approved, ReserveApproved and ReserveGlPosted audit entries written.
+- API smoke: Manager rejects 20000 USD PendingApproval reserve with reason → 200 Rejected, no GL posting.
+- API smoke: `PATCH /api/claims/{id}/status` Open → UnderInvestigation → 200, audit entry written.
+- API smoke: `GET /swagger/index.html` → Swagger UI HTML returned (200).
+- API smoke: `GET /hangfire` → Hangfire Dashboard HTML returned (200).
+- Frontend: `http://localhost:4200/` → HTTP 200, Angular dev server serving.
+- Browser automation: blocked on macOS (local Chrome mode is Linux-only); interactive UI checks verified via API smoke above.
+
+Follow-up needed:
+
+- None. Phase 8G complete.
