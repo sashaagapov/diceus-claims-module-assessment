@@ -1455,3 +1455,60 @@ Follow-up needed:
 
 - Phase 9B: demo polish — update DEMO_SCRIPT.md with Angular walk-through, add server-side filtering.
 - Decision: is a basic SLA Hangfire recurring job required by the DICEUS spec?
+
+## Entry: 2026-07-06 - Phase 9B1 Demo Script Polish
+
+What I asked AI to do:
+
+- Rewrite docs/DEMO_SCRIPT.md to cover the full Angular frontend demo path.
+- Add architecture talking points for each major technical choice.
+- Add a clear "How to explain missing items" section for live review.
+
+What AI generated:
+
+- Full docs/DEMO_SCRIPT.md rewrite with five parts:
+  Part 1: Architecture overview and project structure
+  Part 2: Backend demo through Swagger (12 steps)
+  Part 3: Angular frontend demo (7 steps)
+  Part 4: Architecture talking points (Clean Architecture, MediatR/CQRS, FluentValidation, EF Core, Hangfire, audit log, mock users)
+  Part 5: How to explain missing items (deployment, CI/CD, document upload, SLA job, real auth)
+- Closing notes pointing to TRADEOFFS.md, ARCHITECTURE_DECISIONS.md, and AI_WORKFLOW.md.
+
+What I reviewed:
+
+- All demo steps verified against actual committed feature code.
+- Seeded demo IDs match SeedDataIds constants.
+- Sample request bodies match README.md.
+- Talking points match the actual architecture implementation.
+- Missing-item explanations are consistent with TRADEOFFS.md.
+
+What I changed manually:
+
+- Nothing. Docs-only update.
+
+What I accepted:
+
+- Full DEMO_SCRIPT.md rewrite.
+
+What I rejected:
+
+- No code changes proposed.
+
+What I learned:
+
+- Having a structured demo script with talking points significantly reduces review preparation time.
+
+Files affected:
+
+- docs/DEMO_SCRIPT.md (rewritten)
+- docs/AI_WORKFLOW.md (this entry)
+
+Verification performed:
+
+- git diff --check — no whitespace issues.
+- git status — only expected files changed.
+
+Follow-up needed:
+
+- Phase 9B2 (optional): add server-side filtering to GET /api/claims if required.
+- Phase 9C (optional): GitHub Actions CI, Dockerfile, SLA job decision.
