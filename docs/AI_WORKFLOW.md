@@ -1392,3 +1392,66 @@ Verification performed:
 Follow-up needed:
 
 - None. Phase 8G complete.
+
+## Entry: 2026-07-06 - Phase 9A Full Assessment Gap Audit
+
+What I asked AI to do:
+
+- Compare the current repository implementation against the original DICEUS assessment requirements.
+- Produce a precise gap report covering 18 categories.
+- Estimate overall completion percentage.
+- Identify minimum remaining work for a safe submission.
+- Identify optional work that improves quality without high risk.
+
+What AI generated:
+
+- `docs/ASSESSMENT_GAP_REPORT.md` with full done/partial/missing table across 18 categories.
+- Weighted completion estimate of ~75–80%.
+- Prioritized next phases (9B, 9C) with effort and risk ratings.
+- Submission strategy options (submit now vs. one more phase).
+- Risk analysis for submitting now vs. overbuilding.
+
+What I reviewed:
+
+- All 18 categories against actual committed code and docs.
+- Backend source files, frontend TypeScript files, test files, and all docs confirmed.
+- Verification commands re-run: all pass.
+
+What I changed manually:
+
+- Nothing. Audit-only phase.
+
+What I accepted:
+
+- Gap report as generated.
+- Completion estimate of ~75–80%.
+- Recommendation to do Phase 9B (demo polish + server-side filtering) before submission.
+
+What I rejected:
+
+- No code changes proposed.
+
+What I learned:
+
+- The core MVP value areas (architecture, business rules, persistence, background jobs) are 90–100% complete.
+- The 20–25% gap is almost entirely in items explicitly documented as out of scope.
+- Most important decision before submission: clarify whether SLA job is required by the spec.
+
+Files affected:
+
+- `docs/ASSESSMENT_GAP_REPORT.md` (new)
+- `docs/AI_WORKFLOW.md` (this entry)
+
+Verification performed:
+
+- `dotnet restore ClaimsModule.sln` — all up-to-date.
+- `dotnet build ClaimsModule.sln --no-restore` — Build succeeded, 0 warnings, 0 errors.
+- `dotnet test ClaimsModule.sln` — Passed: 5, Failed: 0, Skipped: 0.
+- `npm install` — dependencies current.
+- `npm run build` — succeeded (budget warning only).
+- `npm test -- --watch=false` — Passed: 2, Failed: 0.
+
+Follow-up needed:
+
+- Phase 9B: demo polish — update DEMO_SCRIPT.md with Angular walk-through, add server-side filtering.
+- Decision: is a basic SLA Hangfire recurring job required by the DICEUS spec?
