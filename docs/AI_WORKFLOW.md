@@ -1170,3 +1170,73 @@ Verification performed:
 Follow-up needed:
 
 - Continue to Phase 8E only after Phase 8D is committed and pushed successfully.
+
+## Entry: 2026-07-06 - Phase 8E Claim Detail Screen
+
+What I asked AI to do:
+
+- Replace the `/claims/:id` placeholder with a real read-only claim detail screen.
+- Do not implement reserve actions, status transition UI, document upload, or later frontend phases.
+
+What AI generated:
+
+- Standalone `ClaimDetail` component under `frontend/claims-module-web/src/app/features/claims/`.
+- `/claims/:id` route wired to the real detail component.
+- Loading, error, and not-found states.
+- Header and summary with claim number, status, policy number, policyholder, cause of loss, and loss date.
+- Tabs for Overview, Parties, Risk Objects, Reserves, and Audit Log.
+- Read-only reserve and audit log tables.
+
+What I reviewed:
+
+- Existing `ClaimDetail` frontend model.
+- Existing `ClaimsApiService.getClaimById()` contract.
+- Phase 8E scope boundaries from the frontend MVP plan.
+
+What I changed manually:
+
+- Sorted audit log entries reverse chronologically in the frontend for predictable display.
+- Kept reserves display-only so Phase 8F can own reserve actions.
+- Updated README and tradeoffs to show the detail screen and remaining action gaps.
+
+What I accepted:
+
+- A sectioned, read-only Material tabs layout.
+- Existing backend detail response without DTO changes.
+
+What I rejected:
+
+- Reserve creation.
+- Reserve approval or rejection.
+- Claim status transition controls.
+- Document upload.
+- Backend business-rule changes.
+
+What I learned:
+
+- The backend detail response already includes enough data for Overview, Parties, Risk Objects, Reserves, and Audit Log tabs.
+
+Files affected:
+
+- `frontend/claims-module-web/src/app/app.routes.ts`
+- `frontend/claims-module-web/src/app/features/claims/claim-detail/`
+- `README.md`
+- `docs/AI_WORKFLOW.md`
+- `docs/TRADEOFFS.md`
+
+Verification performed:
+
+- `npm run build`
+- `npm test -- --watch=false`
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `dotnet test ClaimsModule.sln`
+- `npm start`
+- Manual browser check: `/claims` View action navigated to real `/claims/{id}` detail screen.
+- Manual direct URL check: `/claims/{id}` loaded the same real detail screen.
+- Manual section check: Overview, Parties, Risk Objects, Reserves, and Audit Log tabs rendered expected content or empty states.
+- Manual console check: no browser console errors or warnings from the app.
+
+Follow-up needed:
+
+- Continue to Phase 8F only after Phase 8E is committed and pushed successfully.
