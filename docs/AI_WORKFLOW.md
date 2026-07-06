@@ -1032,7 +1032,8 @@ What AI generated:
 - Standalone `ClaimsList` component under `frontend/claims-module-web/src/app/features/claims/`.
 - Angular route wiring so `/` redirects to `/claims` and `/claims` loads the claims list.
 - A placeholder `/claims/:id` route for future claim detail work.
-- Material table UI with Claim Number, Loss Date, Status, and Actions columns.
+- Material table UI with Claim Number, Policy Number, Policyholder, Loss Date, Cause of Loss, Status, and Actions columns.
+- Client-side search, status filter, and cause-of-loss filter.
 - Loading and empty states for the claims list.
 - Development-only CORS for the local Angular origin.
 
@@ -1046,11 +1047,13 @@ What I reviewed:
 What I changed manually:
 
 - Kept the `View` action as a placeholder route link instead of implementing detail UI.
+- Completed the stricter Phase 8C dashboard requirements after checkpoint review by adding policy/client/cause columns and filters.
 - Updated documentation to show that the frontend now has a claims list but not FNOL/detail/reserve screens.
 
 What I accepted:
 
 - A simple Material table backed by `ClaimsApiService.getClaims()`.
+- Client-side filters because they keep the Phase 8C backend unchanged.
 - The smallest backend startup change needed for local browser API access.
 
 What I rejected:
@@ -1076,13 +1079,17 @@ Files affected:
 
 Verification performed:
 
-- `npm run build`
-- `npm test -- --watch=false`
+- `dotnet restore ClaimsModule.sln`
 - `dotnet build ClaimsModule.sln --no-restore`
 - `dotnet test ClaimsModule.sln`
+- `npm install`
+- `npm run build`
+- `npm test -- --watch=false`
 - `npm start`
-- Manual browser check at `http://localhost:4200/claims`: claims table rendered backend data with Claim Number, Loss Date, Status, and Actions columns.
+- Manual browser check at `http://localhost:4200/claims`: claims table rendered backend data with Claim Number, Policy Number, Policyholder, Loss Date, Cause of Loss, Status, and Actions columns.
+- Manual filter check: text search, status filter, and cause-of-loss filter reduced the visible rows as expected.
 - Manual `View` action check: table link navigated to `/claims/:id` placeholder route.
+- Manual console check: no browser console errors or warnings from the app.
 - API smoke check: `GET http://localhost:5188/api/claims` returned local database claims.
 
 Follow-up needed:
