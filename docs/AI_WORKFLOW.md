@@ -1095,3 +1095,78 @@ Verification performed:
 Follow-up needed:
 
 - Review and approve Phase 8D before implementing the FNOL create claim form.
+
+## Entry: 2026-07-06 - Phase 8D FNOL Create Claim Form
+
+What I asked AI to do:
+
+- Add only the Angular FNOL create claim form.
+- Do not implement the real claim detail screen, reserve UI, document upload, or later frontend phases.
+
+What AI generated:
+
+- Standalone `FnolForm` component under `frontend/claims-module-web/src/app/features/claims/`.
+- `/claims/new` route wired to the FNOL form.
+- Angular Material stepper with claim, parties, risk objects, and review steps.
+- Reactive form controls for policy, cause of loss, loss date, description, parties, and risk objects.
+- Policy and cause-of-loss lookups through the existing frontend API services.
+- Submit flow through `ClaimsApiService.createClaim()`.
+- Success snackbar and redirect to `/claims/{claimId}`.
+- `Log New Claim` link from the claims list.
+
+What I reviewed:
+
+- Backend `CreateClaimCommand` and validator.
+- Existing frontend DTO models and API services.
+- Phase 8D scope limits from the frontend MVP plan.
+
+What I changed manually:
+
+- Used the selected mock user as `createdByUserId`.
+- Kept the post-submit destination as the existing claim detail placeholder route because Phase 8E is not implemented yet.
+- Updated README and tradeoffs to show the FNOL UI and remaining gaps.
+
+What I accepted:
+
+- Sectioned Material stepper using Reactive Forms.
+- Existing-policy and existing-cause selection only.
+
+What I rejected:
+
+- Unknown policy flow.
+- Document upload.
+- Initial reserve creation.
+- Real claim detail UI.
+- Backend business-rule changes.
+
+What I learned:
+
+- The frontend payload can use the existing Phase 8B models without backend DTO changes.
+- Browser smoke tests need to target the nested risk-object description control specifically because the claim and risk object forms both use `description`.
+
+Files affected:
+
+- `frontend/claims-module-web/src/app/app.routes.ts`
+- `frontend/claims-module-web/src/app/features/claims/fnol-form/`
+- `frontend/claims-module-web/src/app/features/claims/claims-list/claims-list.html`
+- `README.md`
+- `docs/AI_WORKFLOW.md`
+- `docs/TRADEOFFS.md`
+
+Verification performed:
+
+- `npm run build`
+- `npm test -- --watch=false`
+- `dotnet restore ClaimsModule.sln`
+- `dotnet build ClaimsModule.sln --no-restore`
+- `dotnet test ClaimsModule.sln`
+- `npm start`
+- Manual browser check at `http://localhost:4200/claims/new`: completed and submitted FNOL form.
+- Manual success check: snackbar showed created claim number and redirected to `/claims/{claimId}` placeholder.
+- Manual API check: `GET /api/claims/{claimId}` returned the created claim with 1 party and 1 risk object.
+- Manual list check: new claim appeared at the top of `/claims`.
+- Manual console check: no browser console errors or warnings from the app.
+
+Follow-up needed:
+
+- Continue to Phase 8E only after Phase 8D is committed and pushed successfully.
