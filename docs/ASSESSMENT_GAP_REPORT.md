@@ -3,7 +3,7 @@
 **Phase:** 9A — Full Assessment Gap Audit  
 **Date:** 2026-07-06  
 **Author:** AI-assisted audit (Antigravity)  
-**Repo state:** commit `41c1ba8` — `docs: polish frontend MVP documentation`  
+**Repo state:** commit `50fb691` — `fix: use CLM-{YYYY}-{7-digit-sequence} claim number format`  
 **Branch:** `main` — clean working tree
 
 ---
@@ -79,7 +79,7 @@ are documented as intentional tradeoffs, not oversights.
 | Party creation in FNOL | ✅ Done | Claimant and other party types |
 | Risk object creation in FNOL | ✅ Done | Vehicle and other types |
 | FluentValidation on FNOL input | ✅ Done | Required fields, date validation |
-| Claim number generation | ✅ Done | `CLM-{date}-{random}` format |
+| Claim number generation | ✅ Done | `CLM-{YYYY}-{7-digit-zero-padded-sequence}` format |
 | `ClaimCreated` audit log entry | ✅ Done | |
 | Initial reserve creation in FNOL | ❌ Missing | Reserve must be created separately |
 | Policy validation (active policy check) | ⚠️ Partial | Policy existence checked; active status not strictly enforced |
@@ -440,6 +440,6 @@ Complete Phase 9B (demo polish + server-side filtering) before submission:
 
 ## Commit and Working Tree Status
 
-- **Last commit:** `41c1ba8` — `docs: polish frontend MVP documentation`
+- **Last commit:** `50fb691` — `fix: use CLM-{YYYY}-{7-digit-sequence} claim number format`
 - **Working tree:** clean before this report
 - **Branch:** `main`, up-to-date with `origin/main`
