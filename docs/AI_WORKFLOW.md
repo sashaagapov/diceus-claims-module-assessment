@@ -13,52 +13,6 @@ Use this file to log important AI-assisted work.
 - Update documentation when scope or architecture changes.
 - Run build/tests when possible after implementation steps.
 
-## Log Template
-
-Copy this section for each meaningful AI-assisted step.
-
-### Entry: YYYY-MM-DD - Short Title
-
-What I asked AI to do:
-
-- 
-
-What AI generated:
-
-- 
-
-What I reviewed:
-
-- 
-
-What I changed manually:
-
-- 
-
-What I accepted:
-
-- 
-
-What I rejected:
-
-- 
-
-What I learned:
-
-- 
-
-Files affected:
-
-- 
-
-Verification performed:
-
-- 
-
-Follow-up needed:
-
-- 
-
 ## Initial Entry: 2026-07-03 - Repository Context Setup
 
 What I asked AI to do:
@@ -80,23 +34,23 @@ What AI generated:
 
 What I reviewed:
 
-- Pending manual review after commit.
+- Baseline planning documents and repository rules after the initial commit.
 
 What I changed manually:
 
-- Pending manual review.
+- Kept the initial setup focused on documentation and workflow context.
 
 What I accepted:
 
-- Pending manual review.
+- Repository context, planning documents, and AI workflow guidance.
 
 What I rejected:
 
-- Pending manual review.
+- Application implementation before the planning baseline was in place.
 
 What I learned:
 
-- Pending manual review.
+- Establishing scope and workflow rules first made later implementation phases easier to review.
 
 Files affected:
 
@@ -1376,7 +1330,7 @@ Verification performed:
 - `npm test -- --watch=false` — Passed: 2, Failed: 0.
 - API smoke: `GET /health` → OK.
 - API smoke: `GET /api/claims` → returns real seeded and test claim records.
-- API smoke: `POST /api/claims` (FNOL) → CLM-20260706-927275 created, status Open, parties and risk objects persisted.
+- API smoke: `POST /api/claims` (FNOL) → CLM-2026-0000089 created, status Open, parties and risk objects persisted.
 - API smoke: `GET /api/claims/{id}` → full detail with parties, risk objects, reserves, audit log.
 - API smoke: `POST /api/claims/{id}/reserves` with 5000 USD → status Approved (auto-approved).
 - API smoke: `POST /api/claims/{id}/reserves` with 15000 USD → status PendingApproval.
