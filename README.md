@@ -1,12 +1,18 @@
 # DICEUS Claims Module Assessment
 
-This repository contains a planned backend-first MVP for a simplified Claims Management System in the insurance domain.
+This repository contains an MVP implementation of a simplified Claims Management System in the insurance domain.
 
-The project is intentionally prepared in phases. This first phase does not implement application code yet. It creates repository context, scope, planning documents, and rules for controlled AI-assisted development.
+It includes a .NET 9 Clean Architecture backend, SQL Server persistence, background GL posting simulation, integration tests, and an Angular frontend for the core FNOL and reserve management demo flow.
+
+## Prerequisites
+
+- Docker Desktop (for SQL Server)
+- .NET 9 SDK
+- Node.js 20+ and npm
 
 ## Project Idea
 
-The system will model a simplified claim lifecycle:
+The system models a simplified claim lifecycle:
 
 - A user creates a claim after a loss event.
 - The first claim creation process is called FNOL, or First Notice of Loss.
@@ -20,7 +26,7 @@ The system will model a simplified claim lifecycle:
 
 ## MVP Direction
 
-This is a backend-first MVP. The first demo path should work through Swagger/OpenAPI before any frontend is added.
+The MVP supports the core assessment flow through both Swagger/OpenAPI and the Angular frontend.
 
 The backend is the main assessment focus because it shows:
 
@@ -33,7 +39,7 @@ The backend is the main assessment focus because it shows:
 - auditability
 - explainable architecture
 
-## Planned Stack
+## Stack
 
 - ASP.NET Core Web API
 - Clean Architecture
@@ -44,9 +50,9 @@ The backend is the main assessment focus because it shows:
 - FluentValidation
 - Swagger/OpenAPI
 - Hangfire
-- Optional Angular frontend after the backend core is stable
+- Angular frontend
 
-## Planned Demo Path
+## Demo Path
 
 1. Start the API.
 2. Open Swagger.
@@ -78,7 +84,7 @@ See `AGENTS.md` and `docs/AI_WORKFLOW.md` for the working rules.
 
 ## Current Status
 
-Phase 7B automated backend integration tests are completed.
+The repository contains a working backend, Angular frontend, and automated backend integration tests.
 
 The repository now contains a .NET 9 Clean Architecture solution with separate Domain, Application, Persistence, Infrastructure, and API projects. The Domain project contains the initial claims-domain entities and enums. The Persistence project contains the EF Core DbContext, entity configurations, seed data, and the initial migration.
 
